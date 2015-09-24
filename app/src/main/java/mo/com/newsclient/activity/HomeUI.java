@@ -8,6 +8,9 @@ import android.support.v4.app.FragmentActivity;
 import mo.com.newsclient.R;
 import mo.com.newsclient.fragment.ContentFrament;
 
+/**
+ * This is using FrameWork of teacher provided
+ */
 public class HomeUI extends FragmentActivity {
 
     @Override
