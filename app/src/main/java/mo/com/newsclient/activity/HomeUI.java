@@ -3,7 +3,8 @@ package mo.com.newsclient.activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+
+import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
 
 import mo.com.newsclient.R;
 import mo.com.newsclient.fragment.ContentFrament;
@@ -11,16 +12,17 @@ import mo.com.newsclient.fragment.ContentFrament;
 /**
  * This is using FrameWork of teacher provided
  */
-public class HomeUI extends FragmentActivity {
+public class HomeUI extends SlidingActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         /*Load Content Layout*/
         setContentView(R.layout.home_content);
 
         //Load Meun Layout TODO
+        setBehindContentView(R.layout.home_menu);
 
         initFragement();
     }
