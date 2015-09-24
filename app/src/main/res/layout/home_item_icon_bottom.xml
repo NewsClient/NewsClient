@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:layout_centerHorizontal="true"
+    android:gravity="center_horizontal"
+    android:layout_weight="1"
+    android:clickable="false"
+    android:focusable="false"
+    android:orientation="vertical">
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/tabbar_home_selector" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/home_botton_text_selector"
+        android:textSize="12sp"
+        android:text="home" />
+</LinearLayout>

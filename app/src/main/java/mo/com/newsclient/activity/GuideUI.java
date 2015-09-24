@@ -1,4 +1,4 @@
-package mo.com.newsclient.UI;
+package mo.com.newsclient.activity;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package mo.com.newsclient.UI;
+package mo.com.newsclient.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,7 +20,6 @@ import mo.com.newsclient.utils.PreferenceUtils;
  * 欢迎界面
  */
 
-
 public class SplashUI extends Activity {
 
     public static final java.lang.String KEY_FIRST_ENTER = "key_first_enter";
@@ -32,11 +31,8 @@ public class SplashUI extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
         initView();
-
         startAnimation();
-
     }
 
     private void startAnimation() {
@@ -44,7 +40,6 @@ public class SplashUI extends Activity {
         RotateAnimation mRotate = new RotateAnimation(0, 360,
                 Animation.RELATIVE_TO_PARENT, 0.5f,
                 Animation.RELATIVE_TO_PARENT, 0.5f);
-
           /*缩放*/
         ScaleAnimation mScale = new ScaleAnimation(0f, 1f,
                 0f, 1f,
@@ -53,7 +48,6 @@ public class SplashUI extends Activity {
 
         /*透明*/
         AlphaAnimation mAlpha = new AlphaAnimation(0, 1);
-
         /*动画集合*/
         mAnimationSet = new AnimationSet(true);
         mAnimationSet.addAnimation(mRotate);
