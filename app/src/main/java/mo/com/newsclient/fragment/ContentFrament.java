@@ -2,21 +2,26 @@ package mo.com.newsclient.fragment;
 
 import android.app.Activity;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
+
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import mo.com.newsclient.R;
+import mo.com.newsclient.activity.HomeUI;
 import mo.com.newsclient.controller.BaseController;
+import mo.com.newsclient.controller.TabController;
 import mo.com.newsclient.controller.tab.GovTabController;
 import mo.com.newsclient.controller.tab.HomeTabController;
 import mo.com.newsclient.controller.tab.NewsCenterController;
 import mo.com.newsclient.controller.tab.SettingController;
 import mo.com.newsclient.controller.tab.SmartSericeController;
-import mo.com.newsclient.view.NoScrollViewPager;
+import mo.com.newsclient.view.LazyViewPager;
 
 /**
  * @项目名: NewsClient
@@ -35,18 +40,20 @@ import mo.com.newsclient.view.NoScrollViewPager;
 public class ContentFrament extends BaseFrament implements RadioGroup.OnCheckedChangeListener {
 
 
-    private NoScrollViewPager mViewPager;
+    private static final String TAG = "ContentFrament";
+    private LazyViewPager mViewPager;       //using Lazy data
     private RadioGroup mRg;
-    private List<BaseController> mListData;
+    private List<TabController> mListData;
     private ContentViewPagerAdapter mAdatper;
     private Activity mAcitivity;
     private RadioGroup mRg1;
+    int mCurrent = 0;
 
     @Override
     protected View initView() {
         View view = View.inflate(mActivity, R.layout.content, null);
         mAcitivity = getActivity();
-        mViewPager = (NoScrollViewPager) view.findViewById(R.id.content_viewpager);
+        mViewPager = (LazyViewPager) view.findViewById(R.id.content_viewpager);
         mRg = (RadioGroup) view.findViewById(R.id.content_rg);
 
         mRg.setOnCheckedChangeListener(this);
@@ -57,7 +64,7 @@ public class ContentFrament extends BaseFrament implements RadioGroup.OnCheckedC
     public void initData() {
         /*add ViewPage Data*/
         if (mListData == null) {
-            mListData = new ArrayList<BaseController>();
+            mListData = new ArrayList<TabController>();
         } else {
             mListData.clear();
         }
@@ -80,28 +87,61 @@ public class ContentFrament extends BaseFrament implements RadioGroup.OnCheckedC
 
         mAdatper = new ContentViewPagerAdapter();
         mViewPager.setAdapter(mAdatper);
+
+        //default selected RadioGroup
+        mRg.check(R.id.content_rb_home);
+
     }
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         switch (checkedId) {
             case R.id.content_rb_home:
-                mViewPager.setCurrentItem(0);
+                mCurrent = 0;
+                //不可以打开菜单
+                enableSildingMenu(false);
                 break;
             case R.id.content_rb_newscenter:
-                mViewPager.setCurrentItem(1);
+                mCurrent = 1;
+                //可以打开菜单
+                enableSildingMenu(true);
                 break;
             case R.id.content_rb_smart_service:
-                mViewPager.setCurrentItem(2);
+                mCurrent = 2;
+                //可以打开菜单
+                enableSildingMenu(true);
                 break;
             case R.id.content_rb_gvo:
-                mViewPager.setCurrentItem(3);
+                mCurrent = 3;
+                //可以打开菜单
+                enableSildingMenu(true);
                 break;
             case R.id.content_rb_setting:
-                mViewPager.setCurrentItem(4);
+                mCurrent = 4;
+                //不可以打开菜单
+                enableSildingMenu(false);
                 break;
 
         }
+        mViewPager.setCurrentItem(mCurrent);
+    }
+
+    private void enableSildingMenu(boolean flag) {
+        HomeUI homeUI= (HomeUI) mActivity;
+        SlidingMenu slidingMenu = homeUI.getSlidingMenu();
+        slidingMenu.setTouchModeAbove(flag?SlidingMenu.TOUCHMODE_FULLSCREEN:SlidingMenu.TOUCHMODE_NONE);
+    }
+
+    /**
+     * select show menu
+     * @param position
+     */
+    public  void switchContent(int position) {
+        //find current menu controller
+        TabController mCurrentController   = mListData.get(mCurrent);
+
+        //notify controller of the menu change
+        mCurrentController.switchMenu(position);
     }
 
     /*It is content viewpager Adapter */
@@ -122,6 +162,7 @@ public class ContentFrament extends BaseFrament implements RadioGroup.OnCheckedC
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
+            Log.i(TAG, "instantiateItem 加载："+position);
             BaseController baseController = mListData.get(position);
             View rootView = baseController.getRootView();
             container.addView(rootView);
@@ -131,6 +172,7 @@ public class ContentFrament extends BaseFrament implements RadioGroup.OnCheckedC
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
+            Log.i(TAG, "destroyItem 销毁："+position);
             container.removeView((View) object);
         }
     }

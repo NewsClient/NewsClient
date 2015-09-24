@@ -37,7 +37,7 @@ public class HomeTabController extends TabController {
         TextView tv = new TextView(context);
         tv.setText("首页  Content");
         tv.setGravity(Gravity.CENTER);
-        tv.setTextSize(20);
+        tv.setTextSize(30);
         tv.setTextColor(context.getResources().getColor(R.color.normal_red));
         return tv;
     }

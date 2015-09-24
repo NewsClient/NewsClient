@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <mo.com.newsclient.view.NoScrollViewPager
+    <mo.com.newsclient.view.LazyViewPager
         android:id="@+id/content_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

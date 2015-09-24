@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_menu_tv_title"
+    android:drawableLeft="@drawable/menu_arr_selector"
+    android:padding="15dp"
+    android:enabled="false"
+    android:drawablePadding="8dp"
+    android:layout_width="match_parent"
+    android:textSize="24sp"
+    android:textColor="@color/menu_list_text"
+    android:layout_height="match_parent" >
+
+</TextView>

@@ -5,5 +5,7 @@
     <color name="normal_gray" >#aaa</color>
     <color name="normal_home_bottom" >#E0E8F0</color>
     <color name="normal_orange" >#FF8200</color>
+    <color name="normal_black" >#000000</color>
     <color name="news_white" >#ffffff</color>
+    <color name="normal_width" >#ffffff</color>
 </resources>

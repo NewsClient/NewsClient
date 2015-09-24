@@ -28,6 +28,12 @@ public class NoScrollViewPager extends ViewPager {
         super(context, attrs);
     }
 
+    /**
+     * don't Intercept Child view Touch Event
+     *
+     * @param ev
+     * @return
+     */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         return false;

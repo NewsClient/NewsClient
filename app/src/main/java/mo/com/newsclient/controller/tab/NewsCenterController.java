@@ -2,9 +2,8 @@ package mo.com.newsclient.controller.tab;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
@@ -13,9 +12,19 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mo.com.newsclient.R;
+import mo.com.newsclient.activity.HomeUI;
 import mo.com.newsclient.bean.NewscenterBean;
+import mo.com.newsclient.controller.BaseController;
 import mo.com.newsclient.controller.TabController;
+import mo.com.newsclient.controller.menu.InteractMenuController;
+import mo.com.newsclient.controller.menu.NewsMenuController;
+import mo.com.newsclient.controller.menu.PicMenuController;
+import mo.com.newsclient.controller.menu.SubjectMenuController;
+import mo.com.newsclient.fragment.MenuFragment;
 import mo.com.newsclient.utils.Constants;
 
 /**
@@ -34,6 +43,8 @@ import mo.com.newsclient.utils.Constants;
 
 public class NewsCenterController extends TabController {
     private static final String TAG = "NewsCenterController";
+    private ArrayList<BaseController> mMenuController;
+    private FrameLayout mContainer;
 
     public NewsCenterController(Context context) {
         super(context);
@@ -42,16 +53,19 @@ public class NewsCenterController extends TabController {
 
     @Override
     protected View initContentView(Context context) {
-        TextView tv = new TextView(context);
+     /*   TextView tv = new TextView(context);
         tv.setText("新闻中心 Content");
         tv.setGravity(Gravity.CENTER);
         tv.setTextSize(30);
-        tv.setTextColor(context.getResources().getColor(R.color.normal_red));
-        return tv;
+        tv.setTextColor(context.getResources().getColor(R.color.normal_red));*/
+        mContainer = new FrameLayout(context);
+        return mContainer;
     }
 
     @Override
     public void initData() {
+
+
         mTitle.setText(mContext.getResources().getString(R.string.tab_news_center));
         mMeun.setVisibility(View.VISIBLE);
 
@@ -68,31 +82,90 @@ public class NewsCenterController extends TabController {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 //Our requested data from network was success
-
                 //now ,we can resovl json data
+
                 String json = responseInfo.result;
-
-                Log.i(TAG, "onSuccess");
-
-                Log.i(TAG, ""+json);
-
-                Gson gson = new Gson();
-                NewscenterBean data =  gson.fromJson(json, NewscenterBean.class);
-
-                Log.i(TAG, " "+data.data.get(0).children.get(0).title);
-
+                processJson(json);
             }
 
             @Override
             public void onFailure(HttpException e, String s) {
 
+                /**
+                 * can't connect network:
+                 * cause:
+                 * 1.phone don't connet the internet
+                 *2.server was destory
+                 */
+                e.printStackTrace();
                 Log.i(TAG, "onFailure");
 
             }
         });
+    }
 
 
+    /**
+     * parse json data
+     *
+     * @param json
+     */
+    private void processJson(String json) {
+        Gson gson = new Gson();
+        NewscenterBean bean = gson.fromJson(json, NewscenterBean.class);
 
+        List<NewscenterBean.NewsMenuBean> menuData = bean.data;
 
+        Log.i(TAG, "menuData:" + menuData.get(0).title);
+
+        /*
+        acquire MenuFregment ,and set data
+         */
+        HomeUI homeUI = (HomeUI) mContext;
+        MenuFragment menuFragment = homeUI.getMenuFragment();
+        menuFragment.setData(menuData);
+
+        mMenuController = new ArrayList<BaseController>();
+        for (int i = 0; i < menuData.size(); i++) {
+            NewscenterBean.NewsMenuBean menuBean = menuData.get(i);
+            switch (menuBean.type) {
+                case 1:
+                    //news menu
+                    mMenuController.add(new NewsMenuController(mContext));
+                    break;
+
+                case 10:
+                    //subject menu
+                    mMenuController.add(new SubjectMenuController(mContext));
+                    break;
+
+                case 2:
+                    //pic menu
+                    mMenuController.add(new PicMenuController(mContext));
+                    break;
+
+                case 3:
+                    //interact menu
+                    mMenuController.add(new InteractMenuController(mContext));
+                    break;
+            }
+
+        }
+        switchMenu(0);
+    }
+
+    /**
+     * check Menu content
+     * @param position
+     */
+    @Override
+    public void switchMenu(int position) {
+
+        // 清空内容
+        mContainer.removeAllViews();
+        BaseController controller = mMenuController.get(position);
+        View rootView = controller.getRootView();
+        mContainer.addView(rootView);
+        controller.initData();
     }
 }

@@ -19,7 +19,7 @@ public class Constants {
     /**
      * Base Server URL
      */
-    public static String BASE_SERVER = "http://192.168.23.1/zhbj";
+    public static String BASE_SERVER = "http://192.168.23.1:8080/zhbj";
 
     /**
      * News Center Url

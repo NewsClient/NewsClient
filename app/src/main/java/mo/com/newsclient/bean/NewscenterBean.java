@@ -18,6 +18,7 @@ public class NewscenterBean {
         public List<NewsListBean> children;
         public long id;
         public String title;
+        public int	type;
         public String url;
         public String url1;
         public String dayurl;
