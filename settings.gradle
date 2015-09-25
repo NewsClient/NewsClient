@@ -1,1 +1,1 @@
-include ':app', ':gson-2.2.4', ':slidingmenu'
+include ':app', ':slidingmenu', ':viewpagerindicator_lib'

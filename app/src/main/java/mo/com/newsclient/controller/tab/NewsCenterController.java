@@ -45,6 +45,7 @@ public class NewsCenterController extends TabController {
     private static final String TAG = "NewsCenterController";
     private ArrayList<BaseController> mMenuController;
     private FrameLayout mContainer;
+    private List<NewscenterBean.NewsMenuBean> mMenuData;
 
     public NewsCenterController(Context context) {
         super(context);
@@ -114,24 +115,24 @@ public class NewsCenterController extends TabController {
         Gson gson = new Gson();
         NewscenterBean bean = gson.fromJson(json, NewscenterBean.class);
 
-        List<NewscenterBean.NewsMenuBean> menuData = bean.data;
+        mMenuData = bean.data;
 
-        Log.i(TAG, "menuData:" + menuData.get(0).title);
+        Log.i(TAG, "mMenuData:" + mMenuData.get(0).title);
 
         /*
         acquire MenuFregment ,and set data
          */
         HomeUI homeUI = (HomeUI) mContext;
         MenuFragment menuFragment = homeUI.getMenuFragment();
-        menuFragment.setData(menuData);
+        menuFragment.setData(mMenuData);
 
         mMenuController = new ArrayList<BaseController>();
-        for (int i = 0; i < menuData.size(); i++) {
-            NewscenterBean.NewsMenuBean menuBean = menuData.get(i);
+        for (int i = 0; i < mMenuData.size(); i++) {
+            NewscenterBean.NewsMenuBean menuBean = mMenuData.get(i);
             switch (menuBean.type) {
                 case 1:
                     //news menu
-                    mMenuController.add(new NewsMenuController(mContext));
+                    mMenuController.add(new NewsMenuController(mContext,menuBean.children));
                     break;
 
                 case 10:
@@ -160,11 +161,14 @@ public class NewsCenterController extends TabController {
      */
     @Override
     public void switchMenu(int position) {
-
         // 清空内容
         mContainer.removeAllViews();
         BaseController controller = mMenuController.get(position);
         View rootView = controller.getRootView();
+
+        // add mTitle text data of list NewsMenuBean
+        NewscenterBean.NewsMenuBean newsMenuBean = mMenuData.get(position);
+        mTitle.setText(newsMenuBean.title);
         mContainer.addView(rootView);
         controller.initData();
     }

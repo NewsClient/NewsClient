@@ -94,6 +94,6 @@
     <orderEntry type="library" exported="" name="support-v4-22.1.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.1.1" level="project" />
     <orderEntry type="module" module-name="slidingmenu" exported="" />
-    <orderEntry type="module" module-name="gson-2.2.4" exported="" />
+    <orderEntry type="module" module-name="viewpagerindicator_lib" exported="" />
   </component>
 </module>
