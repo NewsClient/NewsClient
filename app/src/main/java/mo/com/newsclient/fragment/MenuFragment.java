@@ -40,6 +40,10 @@ public class MenuFragment extends BaseFrament {
         mAdapter = new MeunAdapter();
         mListView.setAdapter(mAdapter);
 
+        HomeUI homeUI = (HomeUI) mActivity;
+        ContentFrament contentFragment = homeUI.getContentFragment();
+        contentFragment.switchContent(mCurrentMenuPosition);
+
         /**
          * click item of ListView
          */

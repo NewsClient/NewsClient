@@ -14,4 +14,5 @@
     <string name="tab_smart_service">智慧服务</string>
     <string name="tab_gov_tab">政务</string>
     <string name="tab_setting">设置</string>
+    <string name="title_activity_detai_ui">DetaiUI</string>
 </resources>

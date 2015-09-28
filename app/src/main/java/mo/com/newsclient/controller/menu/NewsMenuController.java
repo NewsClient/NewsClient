@@ -4,19 +4,23 @@ import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.lidroid.xutils.view.annotation.event.OnClick;
 import com.viewpagerindicator.TabPageIndicator;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import mo.com.newsclient.R;
+import mo.com.newsclient.activity.HomeUI;
 import mo.com.newsclient.bean.NewscenterBean;
 import mo.com.newsclient.controller.BaseController;
+import mo.com.newsclient.controller.news.NewsListController;
 
 
 /**
@@ -25,24 +29,25 @@ import mo.com.newsclient.controller.BaseController;
  */
 
 
-public class NewsMenuController extends BaseController implements ViewPager.OnPageChangeListener {
+public class NewsMenuController extends BaseController implements ViewPager.OnPageChangeListener, SlidingMenu.OnOpenedListener, SlidingMenu.OnOpenListener, SlidingMenu.OnClosedListener, SlidingMenu.OnCloseListener {
 
     private static final String TAG = "NewsMenuController";
 
     @ViewInject(R.id.menu_news_view_pager)
-    ViewPager mViewPager;
+    private ViewPager mViewPager;
 
     @ViewInject(R.id.menu_news_indicator)
     private TabPageIndicator mIndicator;
 
     private List<NewscenterBean.NewsListBean> mListNewsData;
 
-    public NewsMenuController(Context context,List<NewscenterBean.NewsListBean> beanList) {
+    public NewsMenuController(Context context, List<NewscenterBean.NewsListBean> beanList) {
         super(context);
         mListNewsData = beanList;
 
-        Log.i(TAG, "beanList: "+beanList.size());
+        Log.i(TAG, "beanList: " + beanList.size());
     }
+
     @Override
     protected View initView(Context context) {
 
@@ -52,19 +57,34 @@ public class NewsMenuController extends BaseController implements ViewPager.OnPa
         //Using xUtils FrameWork
         //ViewUtils.inject(Object handler, View view)
         com.lidroid.xutils.ViewUtils.inject(NewsMenuController.this, view);
- /*       TextView tv = new TextView(mContext);
-        tv.setText("菜单 新闻");
-        tv.setGravity(Gravity.CENTER);
-        tv.setBackgroundResource(R.color.normal_width);
-        tv.setTextColor(mContext.getResources().getColor(R.color.normal_red));
-        tv.setTextSize(25);*/
+
+        //初始化的时候，设置监听
+        HomeUI homeUI= (HomeUI) mContext;
+        SlidingMenu slidingMenu = homeUI.getSlidingMenu();
+        slidingMenu.setOnOpenedListener(this);
+        slidingMenu.setOnOpenListener(this);
+        slidingMenu.setOnClosedListener(this);
+        slidingMenu.setOnCloseListener(this);
         return view;
     }
+
+    /**
+     * 点击翻页
+     *
+     * @param view
+     */
+    @OnClick(R.id.menu_news_arrow)
+    public void clickArrow(View view) {
+        /*选中下一页*/
+        int currentItem = mViewPager.getCurrentItem();
+        mViewPager.setCurrentItem(++currentItem);
+
+    }
+
     public void initData() {
         //add customes adapter to viewPager
-        NewsMenuAdaper  mAdapter=  new NewsMenuAdaper();
+        NewsMenuAdaper mAdapter = new NewsMenuAdaper();
         mViewPager.setAdapter(mAdapter);
-
 
         // 给indicator设置viewpager
         mIndicator.setViewPager(mViewPager);
@@ -79,14 +99,39 @@ public class NewsMenuController extends BaseController implements ViewPager.OnPa
     }
 
     @Override
-    public void onPageSelected(int i) {
+    public void onPageSelected(int position) {
+        HomeUI homeUI = (HomeUI) mContext;
+        SlidingMenu slidingMenu = homeUI.getSlidingMenu();
+                /*如果当前选中的是第一位，可以拉动菜单*/
+        if (position == 0) {
+            slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        } else {
+            slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+        }
 
     }
 
     @Override
-    public void onPageScrollStateChanged(int i) {
+    public void onOpened() {
+        notifyAllListener();
+    }
+
+    @Override
+    public void onOpen() {
+        notifyAllListener();
+    }
+
+    @Override
+    public void onClosed() {
+        notifyAllListener();
+    }
+
+    @Override
+    public void onClose() {
+        notifyAllListener();
 
     }
+
 
     public class NewsMenuAdaper extends PagerAdapter {
         @Override
@@ -96,27 +141,38 @@ public class NewsMenuController extends BaseController implements ViewPager.OnPa
             }
             return 0;
         }
+
         @Override
         public boolean isViewFromObject(View view, Object object) {
-            return view==object;
+            return view == object;
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            TextView tv = new TextView(mContext);
-            tv.setGravity(Gravity.CENTER);
-            tv.setBackgroundResource(R.color.normal_width);
-            tv.setTextColor(mContext.getResources().getColor(R.color.normal_orange));
-            tv.setTextSize(25);
-            NewscenterBean.NewsListBean children = mListNewsData.get(position);
-            tv.setText(children.title+" 新闻");
 
-            container.addView(tv);
-            return tv;
+            NewscenterBean.NewsListBean bean = mListNewsData.get(position);
+            NewsListController controller = new NewsListController(mContext, bean);
+            View rootView = controller.getRootView();
+            container.addView(rootView);
+            controller.initData();
+
+            /*设置监听事件*/
+//            setOnViewiDLEListener(controller);
+
+            //将标记传给destroy方法
+            rootView.setTag(controller);
+            addOnViewiDLEListener(controller);
+
+            return rootView;
+
         }
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
+            View rootView = (View) object;
+            NewsListController controller = (NewsListController) rootView.getTag();
+            addOnViewiDLEListener(controller);
+
             container.removeView((View) object);
         }
 
@@ -130,6 +186,46 @@ public class NewsMenuController extends BaseController implements ViewPager.OnPa
         }
     }
 
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+
+            //通知一个改变
+            if (mListeners != null) {
+                notifyAllListener();
+            }
+        }
+    }
+
+///*    //1.一个监听
+//    private OnViewiDLEListener mListener;
+
+    private List<OnViewiDLEListener> mListeners = new ArrayList<OnViewiDLEListener>();
+//
+//    //2.设置一个监听
+//    public void setOnViewiDLEListener(OnViewiDLEListener listener) {
+//        mListener = listener;
+//    }*/
+
+    public void addOnViewiDLEListener(OnViewiDLEListener listener) {
+        mListeners.add(listener);
+    }
+
+    public void removeOnViewiDLEListener(OnViewiDLEListener listener) {
+        mListeners.remove(listener);
+    }
+
+    public void notifyAllListener() {
+        ListIterator<OnViewiDLEListener> iterator = mListeners.listIterator();
+        while (iterator.hasNext()) {
+            OnViewiDLEListener listener = iterator.next();
+            listener.onIDLE();
+        }
+    }
+
+    public interface OnViewiDLEListener {
+        void onIDLE();
+    }
 
 
 }

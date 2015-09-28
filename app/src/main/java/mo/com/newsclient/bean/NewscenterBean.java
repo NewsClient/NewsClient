@@ -30,6 +30,16 @@ public class NewscenterBean {
         public String title;
         public int type;
         public String url;
+
+        @Override
+        public String toString() {
+            return "NewsListBean{" +
+                    "id=" + id +
+                    ", title='" + title + '\'' +
+                    ", type=" + type +
+                    ", url='" + url + '\'' +
+                    '}';
+        }
     }
 
 }

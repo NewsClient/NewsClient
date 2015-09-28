@@ -8,46 +8,45 @@
         android:id="@+id/content_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        />
+        android:layout_weight="1" />
 
 
     <RadioGroup
         android:id="@+id/content_rg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
         android:layout_alignParentBottom="true"
         android:background="@color/normal_home_bottom"
         android:orientation="horizontal">
+
         <RadioButton
             android:id="@+id/content_rb_home"
             style="@style/home_bottom_style"
             android:drawableTop="@drawable/tabbar_home_selector"
             android:text="@string/content_home" />
-          <RadioButton
-              android:id="@+id/content_rb_newscenter"
-              style="@style/home_bottom_style"
-              android:drawableTop="@drawable/tabbar_message_selector"
-              android:text="@string/content_message"
-              />
-          <RadioButton
-              android:id="@+id/content_rb_smart_service"
-              style="@style/home_bottom_style"
-              android:drawableTop="@drawable/tabbar_compose_icon_add_seletor"
-              />
-          <RadioButton
-              android:id="@+id/content_rb_gvo"
-              style="@style/home_bottom_style"
-              android:drawableTop="@drawable/tabbar_discover_selector"
-              android:text="@string/content_discover"
-              />
-          <RadioButton
-              android:id="@+id/content_rb_setting"
-              style="@style/home_bottom_style"
-              android:drawableTop="@drawable/tabbar_profile_selector"
-              android:text="@string/content_me"
-              />
+
+        <RadioButton
+            android:id="@+id/content_rb_newscenter"
+            style="@style/home_bottom_style"
+            android:drawableTop="@drawable/tabbar_message_selector"
+            android:text="@string/content_message" />
+
+        <RadioButton
+            android:id="@+id/content_rb_smart_service"
+            style="@style/home_bottom_style"
+            android:drawableTop="@drawable/tabbar_compose_icon_add_seletor" />
+
+        <RadioButton
+            android:id="@+id/content_rb_gvo"
+            style="@style/home_bottom_style"
+            android:drawableTop="@drawable/tabbar_discover_selector"
+            android:text="@string/content_discover" />
+
+        <RadioButton
+            android:id="@+id/content_rb_setting"
+            style="@style/home_bottom_style"
+            android:drawableTop="@drawable/tabbar_profile_selector"
+            android:text="@string/content_me" />
 
     </RadioGroup>
 

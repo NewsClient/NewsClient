@@ -28,6 +28,7 @@ import mo.com.newsclient.activity.HomeUI;
 public abstract class TabController extends BaseController {
 
     protected TextView mTitle;
+    protected ImageView mListOrGrid;
     protected ImageView mMeun;
     protected FrameLayout mContentLayout;
 
@@ -38,6 +39,7 @@ public abstract class TabController extends BaseController {
     protected View initView(final Context context) {
         View view = View.inflate(context, R.layout.tab_layout, null);
         mMeun = (ImageView) view.findViewById(R.id.tab_iv_meun);
+        mListOrGrid = (ImageView) view.findViewById(R.id.tab_iv_list_or_grid);
         mTitle = (TextView) view.findViewById(R.id.tab_tv_title);
         mContentLayout = (FrameLayout) view.findViewById(R.id.tab_fl_content);
         /**

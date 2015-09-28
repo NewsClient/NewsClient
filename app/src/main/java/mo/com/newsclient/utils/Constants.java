@@ -25,4 +25,9 @@ public class Constants {
      * News Center Url
      */
     public static String NEWS_CENTER_URL =BASE_SERVER+ "/categories.json";
+
+    /**
+     * Pix Url
+     */
+    public static String NEWS_CENTER_PIC_URL = BASE_SERVER+"/photos/photos_1.json";
 }

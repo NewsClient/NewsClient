@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.view.Window;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
@@ -23,6 +24,7 @@ public class HomeUI extends SlidingFragmentActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         /*Load Content Layout*/
@@ -44,7 +46,7 @@ public class HomeUI extends SlidingFragmentActivity {
         slidingMenu.setBehindScrollScale(0.5f);
 
         //setting shadow
-        slidingMenu.setShadowWidth(DimenUtils.pdTopx(this,20));
+        slidingMenu.setShadowWidth(DimenUtils.pdTopx(this, 20));
         slidingMenu.setShadowDrawable(R.drawable.shadow);
 
         //load left meun and content of fragment

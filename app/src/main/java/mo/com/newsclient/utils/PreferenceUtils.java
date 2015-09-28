@@ -129,5 +129,38 @@ public class PreferenceUtils {
         SharedPreferences sp = getSp(context);
         sp.edit().putInt(key, value).commit();
     }
+    /**
+     * 获得long类型的数据,没有时默认值为-1
+     * @param context
+     * @param key
+     * @return
+     */
+    public static long getLong(Context context, String key) {
+       return   getLong(context, key, -1);
+    }
+
+    /**
+     * 获得获得long类型的数据,没有时默认值为0
+     * @param context
+     * @param key
+     * @return
+     */
+    public static long getLong(Context context, String key,long defValue) {
+        SharedPreferences sp = getSp(context);
+        long value = sp.getLong(key, defValue);
+        return value;
+    }
+
+
+    /**
+     * 保存Long类型的数据,没有时默认值为-1
+     * @param context
+     * @param key
+     * @return
+     */
+    public static void putLong(Context context, String key, long value) {
+        SharedPreferences sp = getSp(context);
+        sp.edit().putLong(key, value).commit();
+    }
 
 }
