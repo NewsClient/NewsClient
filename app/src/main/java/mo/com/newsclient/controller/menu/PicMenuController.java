@@ -27,6 +27,7 @@ import mo.com.newsclient.bean.NewscenterBean;
 import mo.com.newsclient.controller.BaseController;
 import mo.com.newsclient.controller.tab.NewsCenterController;
 import mo.com.newsclient.utils.Constants;
+import mo.com.newsclient.utils.PreferenceUtils;
 
 /**
  * 作者：MoMxMo on 2015/9/24 21:46
@@ -37,6 +38,7 @@ import mo.com.newsclient.utils.Constants;
 public class PicMenuController extends BaseController implements NewsCenterController.OnListOrGridListener {
 
     private static final String TAG = "PicMenuController";
+    private static final String KEY_LIST_OR_GRID = "key_list_or_grid";
     private GridView mGVPic;
     private ListView mLVPic;
     private NewscenterBean.NewsMenuBean menuBean;
@@ -59,6 +61,19 @@ public class PicMenuController extends BaseController implements NewsCenterContr
 
         mLVPic = (ListView) view.findViewById(R.id.menu_pic_lv);
         mGVPic = (GridView) view.findViewById(R.id.menu_pic_gv);
+
+        isDispalyList = PreferenceUtils.getBoolean(context, KEY_LIST_OR_GRID);
+
+        if (isDispalyList) {
+            //如果当前是listView显示，点击之后，listView隐藏，gridView显示,图标显示List
+            mLVPic.setVisibility(View.GONE);
+            mGVPic.setVisibility(View.VISIBLE);
+
+        } else {
+            //如果当前是GridView显示，点击之后，gridView隐藏，listView显示,图标显示grid
+            mLVPic.setVisibility(View.VISIBLE);
+            mGVPic.setVisibility(View.GONE);
+        }
         return view;
     }
 
@@ -120,6 +135,7 @@ public class PicMenuController extends BaseController implements NewsCenterContr
             mGVPic.setVisibility(View.GONE);
             view.setImageResource(R.drawable.icon_pic_grid_type);
         }
+        PreferenceUtils.putBoolean(mContext,KEY_LIST_OR_GRID,isDispalyList);
         isDispalyList = !isDispalyList;
     }
 
@@ -161,6 +177,8 @@ public class PicMenuController extends BaseController implements NewsCenterContr
                 holder = (ViewHolder) convertView.getTag();
             }
             NewsPagerBean.Data.News news = mNewsDatas.get(position);
+            //设置默认的图片
+            holder.mPic.setImageResource(R.drawable.pic_item_list_default);
             mBitmapUtils.display(holder.mPic,news.listimage);
             holder.mTvTitle.setText(news.title);
             holder.mTvDate.setText(news.pubdate);

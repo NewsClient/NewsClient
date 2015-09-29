@@ -22,6 +22,7 @@
             android:id="@+id/refresh_header_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             />
     </FrameLayout>
 
@@ -39,6 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/normal_red"
+            android:layout_gravity="center_horizontal"
             android:singleLine="true"
             android:textSize="18sp" />
 
@@ -48,8 +50,7 @@
             android:gravity="center_horizontal"
             android:singleLine="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="上次更新：111000000000000000001111"/>
+            android:layout_height="wrap_content"/>
     </LinearLayout>
     </RelativeLayout>
 

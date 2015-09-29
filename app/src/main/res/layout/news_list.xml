@@ -4,16 +4,16 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <ListView
+<!--    <ListView
         android:id="@+id/news_list_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    </ListView>
- <!--   <mo.com.newsclient.view.RefreshListView
+    </ListView>-->
+    <mo.com.newsclient.view.RefreshListView
         android:id="@+id/news_list_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    </mo.com.newsclient.view.RefreshListView>-->
+    </mo.com.newsclient.view.RefreshListView>
 
 
 </LinearLayout>

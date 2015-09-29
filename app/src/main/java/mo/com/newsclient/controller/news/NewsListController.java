@@ -1,7 +1,6 @@
 package mo.com.newsclient.controller.news;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -14,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +29,6 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 import java.util.List;
 
 import mo.com.newsclient.R;
-import mo.com.newsclient.activity.DetaiUI;
 import mo.com.newsclient.bean.NewsPagerBean;
 import mo.com.newsclient.bean.NewscenterBean;
 import mo.com.newsclient.controller.BaseController;
@@ -40,6 +37,7 @@ import mo.com.newsclient.utils.Constants;
 import mo.com.newsclient.utils.DimenUtils;
 import mo.com.newsclient.utils.PreferenceUtils;
 import mo.com.newsclient.view.FocusedViewPager;
+import mo.com.newsclient.view.RefreshListView;
 
 /**
  * 作者：MoMxMo on 2015/9/26 16:11
@@ -47,12 +45,13 @@ import mo.com.newsclient.view.FocusedViewPager;
  */
 
 
-public class NewsListController extends BaseController implements ViewPager.OnPageChangeListener,NewsMenuController.OnViewiDLEListener, AdapterView.OnItemClickListener {
+public class NewsListController extends BaseController implements ViewPager.OnPageChangeListener, NewsMenuController.OnViewiDLEListener, AdapterView.OnItemClickListener, RefreshListView.OnRefreshLitener {
 
     private static final String TAG = "NewsListController";
     private NewscenterBean.NewsListBean mData;
     private List<NewsPagerBean.Data.Topnews> mTopnews;
-    private  List<NewsPagerBean.Data.News> newsData;
+    private List<NewsPagerBean.Data.News> newsData;
+    private String mMoreUrl;
 
     @ViewInject(R.id.news_list_viewpager)
     private FocusedViewPager mViewPager;
@@ -64,8 +63,8 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
     private LinearLayout mPointContainer;
 
     @ViewInject(R.id.news_list_listview)
-    private ListView mListView;
-//    private RefreshListView mListView;
+//    private ListView mListView;
+    private RefreshListView mListView;
 
     private NewsListPicAdapter mAapter;
     BitmapUtils mBitmapUtils;
@@ -79,13 +78,18 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
     @Override
     protected View initView(Context context) {
         View view = View.inflate(context, R.layout.news_list, null);
-        mBitmapUtils   = new BitmapUtils(mContext);
+        mBitmapUtils = new BitmapUtils(mContext);
         ViewUtils.inject(this, view);
-
 
         View topViewPic = View.inflate(context, R.layout.news_top_pic, null);
         mListView.addHeaderView(topViewPic);
         ViewUtils.inject(this, topViewPic);
+
+        /*设置刷新的监听事件*/
+        mListView.setOnRefreshLitener(this);
+
+        //设置点击事件
+        mListView.setOnItemClickListener(this);
         return view;
     }
 
@@ -93,7 +97,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
     public void initData() {
         /*初始化View的地方不能勾加载数据，不然会报nullPoint异常*/
         /*加载缓存数据*/
-        String url = Constants.BASE_SERVER + mData.url;
+        final String url = Constants.BASE_SERVER + mData.url;
         String json = PreferenceUtils.getString(mContext, url);
         if (!TextUtils.isEmpty(json)) {
             processJson(json);
@@ -109,7 +113,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
                 String json = responseInfo.result;
 
                 /*保存缓存数据*/
-                PreferenceUtils.putString(mContext, json, null);
+                PreferenceUtils.putString(mContext, url, json);
 
                 /*解析数据*/
                 processJson(json);
@@ -132,18 +136,20 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
      */
     private void processJson(String json) {
 
-
         Gson gson = new Gson();
+
         NewsPagerBean newsPagerBean = gson.fromJson(json, NewsPagerBean.class);
+
+        mMoreUrl = newsPagerBean.data.more;
 
         /*判断加载的数据是否正确*/
         if (newsPagerBean.retcode == 200) {
         /*获取轮播图片数据*/
-            Log.i(TAG, "................. "+newsPagerBean.data.title);
+            Log.i(TAG, "................. " + newsPagerBean.data.title);
             mTopnews = newsPagerBean.data.topnews;
 
             //新闻数据列表
-            newsData= newsPagerBean.data.news;
+            newsData = newsPagerBean.data.news;
         }
 
         /*网络加载轮播图的图片,数据*/
@@ -153,8 +159,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
         //TODO
         mListView.setAdapter(new NewsAdapter());
 
-        //设置点击事件
-        mListView.setOnItemClickListener(this);
+
 
         /*加载点*/
         /*清楚*/
@@ -162,7 +167,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
         for (int i = 0; i < mTopnews.size(); i++) {
             NewsPagerBean.Data.Topnews bean = mTopnews.get(i);
             View view = new View(mContext);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(DimenUtils.pdTopx(mContext,10),DimenUtils.pdTopx(mContext,10));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(DimenUtils.pdTopx(mContext, 10), DimenUtils.pdTopx(mContext, 10));
 
             if (i != 0) {
                 params.leftMargin = DimenUtils.pxTopd(mContext, 10);
@@ -173,7 +178,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
             }
          /*设置图片标题*/
             mTv_title.setText(bean.title);
-            mPointContainer.addView(view,params);
+            mPointContainer.addView(view, params);
         }
 
         mViewPager.setOnPageChangeListener(this);
@@ -211,10 +216,11 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
             }
         });
 
-   }
+    }
 
     /**
      * 点击进入新闻详情
+     *
      * @param parent
      * @param view
      * @param position
@@ -222,17 +228,99 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.i(TAG, "onItemClick 点击新闻详情");
+        Log.i(TAG, "onItemClick 点击新闻详情:" + position);
 
-        /*先消除ListView中的头部分*/
+/*        *//*先消除ListView中的头部分*//*
         position = position - mListView.getHeaderViewsCount();
 
         NewsPagerBean.Data.News news = newsData.get(position);
         Intent intent = new Intent(mContext,DetaiUI.class);
         intent.putExtra(DetaiUI.KEY_URL, news.url);
-        mContext.startActivity(intent);
+        mContext.startActivity(intent);*/
 
     }
+
+    //  刷新数据
+
+    @Override
+    public void onRefresh() {
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final String url = Constants.BASE_SERVER + mData.url;
+        /*加载网络中的新闻数据*/
+                HttpUtils utils = new HttpUtils();
+                utils.send(HttpRequest.HttpMethod.GET, url, null, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+                        String json = responseInfo.result;
+                /*保存缓存数据*/
+                        PreferenceUtils.putString(mContext, url, json);
+                /*解析数据*/
+                        processJson(json);
+
+                /*通知数据加载完成*/
+                        mListView.setSuccessRefresh();
+                    }
+
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+                /*加载数据失败*/
+                        Toast.makeText(mContext, "抱歉，联网失败", Toast.LENGTH_SHORT).show();
+                        mListView.setSuccessRefresh();
+                    }
+                });
+            }
+        }, 3000);
+
+
+    }
+
+    @Override
+    public void onLoadMore() {
+        Log.i(TAG, "加载更多数据 ");
+        //网络加载更多数据，并添加到内存中
+        if (TextUtils.isEmpty(mMoreUrl)) {
+            Toast.makeText(mContext, "没有更多数据加载", Toast.LENGTH_SHORT).show();
+            //通知加载更多数据完成
+            mListView.setSuccessLoadMore();
+            return;
+        }
+        //  加载缓存数据
+        final String url = Constants.BASE_SERVER + mMoreUrl;
+//        加载网络中的新闻数据
+        HttpUtils utils = new HttpUtils();
+        utils.send(HttpRequest.HttpMethod.GET, url, null, new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+//                加载数据成
+//                获取数据
+                String json = responseInfo.result;
+//                保存缓存数据
+                PreferenceUtils.putString(mContext, url, json);
+                Gson gson = new Gson();
+                NewsPagerBean newsPagerBean = gson.fromJson(json, NewsPagerBean.class);
+                newsData.addAll(newsPagerBean.data.news);
+                mMoreUrl = newsPagerBean.data.more;
+                mAapter.notifyDataSetChanged();
+
+                //通知加载更多数据完成
+                mListView.setSuccessLoadMore();
+            }
+
+            @Override
+            public void onFailure(HttpException e, String s) {
+                Toast.makeText(mContext, "抱歉，联网失败", Toast.LENGTH_SHORT).show();
+                //通知加载更多数据完成
+                mListView.setSuccessLoadMore();
+
+            }
+        });
+
+    }
+
 
     /**
      * 新闻适配器
@@ -272,7 +360,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
                 mHolder.mIcon = (ImageView) convertView.findViewById(R.id.item_news_icon);
                 convertView.setTag(mHolder);
             } else {
-                mHolder= (ViewHolder) convertView.getTag();
+                mHolder = (ViewHolder) convertView.getTag();
             }
             NewsPagerBean.Data.News news = newsData.get(position);
 
@@ -287,12 +375,14 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
             return convertView;
         }
     }
-    private class ViewHolder{
+
+    private class ViewHolder {
         public ImageView mIcon;
         public TextView mTitile;
         public TextView mTime;
         public ImageView mComment;
     }
+
     private class SwitchHandler extends Handler implements Runnable {
 
         @Override
@@ -343,7 +433,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
                 /*改变图标*/
         for (int i = 0; i < count; i++) {
             View view = mPointContainer.getChildAt(i);
-            view.setBackgroundResource(i==position?R.drawable.dot_focus:R.drawable.dot_normal);
+            view.setBackgroundResource(i == position ? R.drawable.dot_focus : R.drawable.dot_normal);
         }
 
     }
@@ -367,6 +457,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
         public boolean isViewFromObject(View view, Object object) {
             return view == object;
         }
+
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             NewsPagerBean.Data.Topnews bean = mTopnews.get(position);
@@ -384,6 +475,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
 
             return mImageView;
         }
+
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView((View) object);
@@ -394,7 +486,7 @@ public class NewsListController extends BaseController implements ViewPager.OnPa
     public void onIDLE() {
 
         //开始轮播图片
-        if (mSwitchHandler!=null) {
+        if (mSwitchHandler != null) {
             mSwitchHandler.start();
         }
     }

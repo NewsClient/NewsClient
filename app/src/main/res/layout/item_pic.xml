@@ -18,8 +18,7 @@
                 android:id="@+id/item_pic_icon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:src="@drawable/pic_item_list_default" />
+                android:scaleType="fitXY" />
             <TextView
                 android:id="@+id/item_pic_title"
                 android:layout_width="wrap_content"
